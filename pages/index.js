@@ -6,21 +6,26 @@ export default function Home() {
 
   useEffect(() => {
     fetch('/api/faqs')
-      .then(res => res.json())
-      .then(data => setFaqs(data));
+      .then((res) => res.json())
+      .then((data) => setFaqs(data));
   }, []);
 
   return (
-    <main>
-      <h1>FAQs</h1>
-      <ul>
-        {faqs.map((faq, i) => (
-          <li key={i}>
-            <strong>Q:</strong> {faq.question}<br />
-            <strong>A:</strong> {faq.answer}
-          </li>
-        ))}
-      </ul>
+    <main style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
+      <h1>📘 Hackathon FAQs</h1>
+      {faqs.length === 0 ? (
+        <p>Loading FAQs...</p>
+      ) : (
+        <ul style={{ paddingLeft: 0 }}>
+          {faqs.map((faq, index) => (
+            <li key={index} style={{ marginBottom: '1rem', listStyle: 'none' }}>
+              <strong>Q:</strong> {faq.question}<br />
+              <strong>A:</strong> {faq.answer}
+            </li>
+          ))}
+        </ul>
+      )}
     </main>
   );
 }
+
