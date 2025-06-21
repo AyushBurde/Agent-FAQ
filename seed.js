@@ -1,10 +1,9 @@
-require('dotenv').config();
-const mongoose = require('mongoose');
-const Faq = require('./models/Faq'); // no .js extension
-const { getEmbedding } = require('./backend/embedding'); // Make sure this is CommonJS too
+import mongoose from 'mongoose';
+import Faq from '../models/Faq.js'; // Use `.js` for ES modules
+import { getEmbedding } from '../backend/embedding.js';
 
 const MONGO_URI = process.env.MONGO_URI;
-const guildId = '1377306965872611388'; // Your real Discord Server ID
+const guildId = '1377306965872611388';
 
 const faqs = [
   {
@@ -23,16 +22,20 @@ const faqs = [
     question: "Are goodies provided in the hackathon?",
     answer: "Yes, participants will receive goodies during the event."
   },
-  { question: "Will we receive goodies?", 
-    answer: "Yes, each participant receives a goodie bag." 
+  {
+    question: "Will we receive goodies?",
+    answer: "Yes, each participant receives a goodie bag."
   }
-  
 ];
 
-const seedDB = async () => {
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Only POST method allowed' });
+  }
+
   try {
     await mongoose.connect(MONGO_URI);
-    await Faq.deleteMany({ guildId }); // clear old entries
+    await Faq.deleteMany({ guildId });
 
     for (const item of faqs) {
       const embedding = await getEmbedding(item.question);
@@ -45,12 +48,11 @@ const seedDB = async () => {
       console.log(`✅ Seeded: ${item.question}`);
     }
 
+    return res.status(200).json({ success: true, message: 'Seeding done' });
   } catch (error) {
     console.error('Error seeding DB:', error);
+    return res.status(500).json({ error: 'Seeding failed' });
   } finally {
     mongoose.connection.close();
   }
-};
-
-seedDB();
-console.log("✅ Seeded FAQs for guildId:", guildId);
+}
