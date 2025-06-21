@@ -1,13 +1,19 @@
-import dbConnect from '../utils/db';
-import Faq from '../models/Faq';
+import dbConnect from '@/lib/dbConnect';
+import Faq from '@/models/Faq';
 
 export default async function handler(req, res) {
+  await dbConnect();
+
   if (req.method === 'GET') {
-    await dbConnect();
-    const faqs = await Faq.find({});
-    return res.status(200).json(faqs);
+    const { guildId } = req.query;
+
+    try {
+      const faqs = await Faq.find(guildId ? { guildId } : {});
+      res.status(200).json({ success: true, data: faqs });
+    } catch (error) {
+      res.status(400).json({ success: false, error: error.message });
+    }
   } else {
-    res.setHeader('Allow', ['GET']);
-    res.status(405).end(`Method ${req.method} Not Allowed`);
+    res.status(405).json({ success: false, message: 'Method not allowed' });
   }
 }
