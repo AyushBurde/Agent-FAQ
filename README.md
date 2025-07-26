@@ -429,8 +429,8 @@ SOFTWARE.
 [![GitHub: DakshN07](https://img.shields.io/badge/GitHub-DakshN07-181717?style=flat&logo=github)](https://github.com/DakshN07)
 [![GitHub: AyushBurde](https://img.shields.io/badge/GitHub-AyushBurde-181717?style=flat&logo=github)](https://github.com/AyushBurde)
 
-- **[Daksh Nayak](https://github.com/DakshN07)** - *Full-stack development & deployment*
-- **[Ayush Burde](https://github.com/AyushBurde)** - *Original project concept & architecture*
+- **[Daksh Nayak](https://github.com/DakshN07)** - *Frontend development, database & deployment*
+- **[Ayush Burde](https://github.com/AyushBurde)** - *Main project concept, backend & architecture*
 
 ---
 
