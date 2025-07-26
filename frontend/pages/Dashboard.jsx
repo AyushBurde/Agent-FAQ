@@ -19,7 +19,7 @@ const Dashboard = () => {
       setLoading(true);
       setError('');
       try {
-        const res = await fetch('/api/analytics');
+        const res = await fetch('https://agent-faq.onrender.com/api/analytics');
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         const data = await res.json();
         setStats(data);

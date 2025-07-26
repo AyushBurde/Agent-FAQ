@@ -19,7 +19,7 @@ const Suggested = () => {
     setError('');
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('/api/suggestions', {
+      const res = await fetch('https://agent-faq.onrender.com/api/suggestions', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -45,7 +45,7 @@ const Suggested = () => {
 
   const handleSaveFAQ = async (question, answer) => {
     try {
-      const res = await fetch('/api/faqs', {
+              const res = await fetch('https://agent-faq.onrender.com/api/faqs', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

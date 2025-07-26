@@ -37,7 +37,7 @@ export default function AcceptInvite() {
     setError('');
     setSuccess('');
     try {
-      const res = await fetch('/api/accept-invite', {
+      const res = await fetch('https://agent-faq.onrender.com/api/accept-invite', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, password }),

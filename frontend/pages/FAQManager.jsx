@@ -15,7 +15,7 @@ const FAQManager = () => {
 
   const fetchFaqs = async () => {
     try {
-      const response = await fetch('/api/faqs');
+      const response = await fetch('https://agent-faq.onrender.com/api/faqs');
       if (!response.ok) {
         throw new Error('Failed to fetch FAQs');
       }
@@ -32,7 +32,7 @@ const FAQManager = () => {
 
   const handleAdd = async (faq) => {
     try {
-      const response = await fetch('/api/faqs', {
+              const response = await fetch('https://agent-faq.onrender.com/api/faqs', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -55,7 +55,7 @@ const FAQManager = () => {
 
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`/api/faqs/${id}`, {
+              const response = await fetch(`https://agent-faq.onrender.com/api/faqs/${id}`, {
         method: 'DELETE',
       });
 

@@ -17,7 +17,7 @@ const Settings = () => {
     setError('');
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('/api/settings', {
+      const res = await fetch('https://agent-faq.onrender.com/api/settings', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -46,7 +46,7 @@ const Settings = () => {
     setSaving(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('/api/settings', {
+      const res = await fetch('https://agent-faq.onrender.com/api/settings', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

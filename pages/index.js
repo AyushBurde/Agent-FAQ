@@ -5,7 +5,7 @@ export default function Home() {
   const [faqs, setFaqs] = useState([]);
 
   useEffect(() => {
-    fetch('/api/faqs')
+    fetch('https://agent-faq.onrender.com/api/faqs')
       .then((res) => res.json())
       .then((data) => setFaqs(data));
   }, []);

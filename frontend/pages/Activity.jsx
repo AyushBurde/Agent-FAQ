@@ -13,7 +13,7 @@ const Activity = () => {
 
   const fetchUnknownQuestions = async () => {
     try {
-      const response = await fetch('/api/unknown-questions');
+      const response = await fetch('https://agent-faq.onrender.com/api/unknown-questions');
       if (!response.ok) {
         throw new Error('Failed to fetch unknown questions');
       }
