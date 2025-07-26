@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 const faqSchema = new mongoose.Schema({
   guildId: {
@@ -19,4 +19,4 @@ const faqSchema = new mongoose.Schema({
   },
 });
 
-export default mongoose.models.Faq || mongoose.model('Faq', faqSchema);
+module.exports = mongoose.models.Faq || mongoose.model('Faq', faqSchema);

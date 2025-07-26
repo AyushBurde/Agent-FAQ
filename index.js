@@ -1,10 +1,14 @@
-require('dotenv').config();
+require('dotenv').config({ path: __dirname + '/.env' });
+console.log('DEBUG: GEMINI_API_KEY:', process.env.GEMINI_API_KEY);
+console.log('DEBUG: All ENV:', process.env);
 const { Client, GatewayIntentBits, PermissionsBitField } = require('discord.js');
 const { getEmbedding } = require('./backend/embedding');
 const { cosineSimilarity } = require('./backend/similarity');
 const mongoose = require('mongoose');
 const Faq = require('./models/Faq');
 const UnknownQuestion = require('./models/UnknownQuestion');
+const Analytics = require('./models/Analytics');
+
 
 const client = new Client({
   intents: [
@@ -46,6 +50,11 @@ client.on('messageCreate', async (message) => {
 
       // Admin chooses to skip saving answer
       if (message.content.toLowerCase().trim() === 'skip') {
+        // Update analytics: This question was asked 3 times but skipped
+        const analyticsDoc = await Analytics.findOne() || await Analytics.create({});
+        analyticsDoc.unmatched += 1;
+        await analyticsDoc.save();
+        
         await message.reply("✅ Skipped saving the question.");
         pendingFaqReplies.delete(message.author.id);
         return;
@@ -66,6 +75,11 @@ client.on('messageCreate', async (message) => {
         embedding
       });
 
+      // Update analytics: This question was asked 3 times and now answered
+      const analyticsDoc = await Analytics.findOne() || await Analytics.create({});
+      analyticsDoc.matched += 1;
+      await analyticsDoc.save();
+
       await message.reply("✅ New FAQ saved successfully!");
       console.log(`✅ Saved new FAQ for guild ${guildId}: "${question}" -> "${message.content.trim()}"`);
 
@@ -80,8 +94,6 @@ client.on('messageCreate', async (message) => {
 
   const guildId = message.guild.id;
   const userMsg = message.content.toLowerCase().trim();
-
-;
 
   // Load all FAQs for the guild
   const faqs = await Faq.find({ guildId });
@@ -107,19 +119,21 @@ client.on('messageCreate', async (message) => {
     }
   }
 
-  // If good match found, reply with answer
+  console.log("🔍 User question:", userMsg);
+  console.log("📘 Matched FAQ:", bestMatch?.question);
+  console.log("📊 Similarity score:", bestScore);
+
+  // First check if we have a good match (>= 0.85)
   if (bestScore >= 0.85) {
+    const analyticsDoc = await Analytics.findOne() || await Analytics.create({});
+    analyticsDoc.matched += 1;
+    await analyticsDoc.save();
     console.log(`🧠 Matched with "${bestMatch.question}" in guild ${guildId} (score: ${bestScore.toFixed(2)})`);
     await message.channel.send(bestMatch.answer);
     return;
   }
 
-  console.log("🔍 User question:", userMsg);
-  console.log("📘 Matched FAQ:", bestMatch?.question);
-  console.log("📊 Similarity score:", bestScore)
-
-
-  // Handle unknown question tracking
+  // If no good match, handle unknown question tracking
   let unknown = await UnknownQuestion.findOne({ guildId, text: userMsg });
 
   if (unknown) {

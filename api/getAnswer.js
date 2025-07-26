@@ -1,7 +1,7 @@
-import { connectToDatabase } from '../../backend/db'; // create a db.js helper
-import { getRelevantAnswer } from '../../backend/similarity'; // your logic
+const { connectToDatabase } = require('../../backend/db'); // create a db.js helper
+const { getRelevantAnswer } = require('../../backend/similarity'); // your logic
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
@@ -15,3 +15,5 @@ export default async function handler(req, res) {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 }
+
+module.exports = handler;

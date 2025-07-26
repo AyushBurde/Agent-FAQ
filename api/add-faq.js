@@ -1,7 +1,8 @@
-import dbConnect from '../utils/db';
-import Faq from '../models/Faq';
+const dbConnect = require('../utils/db');
+const Faq = require('../models/Faq');
+const authMiddleware = require('./authMiddleware');
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   if (req.method === 'POST') {
     await dbConnect();
 
@@ -16,6 +17,7 @@ export default async function handler(req, res) {
       question,
       answer,
       embedding,
+      createdBy: req.user.id, // Optionally track creator
     });
 
     return res.status(201).json(newFaq);
@@ -24,3 +26,5 @@ export default async function handler(req, res) {
     res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 }
+
+module.exports = authMiddleware(handler);

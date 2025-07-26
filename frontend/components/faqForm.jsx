@@ -1,16 +1,20 @@
 import React, { useState } from "react";
+import toast from 'react-hot-toast';
 
-function AddFAQForm({ onAdd }) {
+function FAQForm({ onAdd }) {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (question && answer) {
-      onAdd({ question, answer });
-      setQuestion("");
-      setAnswer("");
+    if (!question || !answer) {
+      toast.error('Please fill in both question and answer.');
+      return;
     }
+    onAdd({ question, answer });
+    setQuestion("");
+    setAnswer("");
+    toast.success('FAQ added successfully!');
   };
 
   return (
@@ -39,4 +43,4 @@ function AddFAQForm({ onAdd }) {
   );
 }
 
-export default AddFAQForm;
+export default FAQForm;

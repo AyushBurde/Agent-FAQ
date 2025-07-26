@@ -1,6 +1,6 @@
-import mongoose from 'mongoose';
-import Faq from '../models/Faq.js'; // Use `.js` for ES modules
-import { getEmbedding } from '../backend/embedding.js';
+const mongoose = require('mongoose');
+const Faq = require('../models/Faq.js'); // Use `.js` for ES modules
+const { getEmbedding } = require('../backend/embedding.js');
 
 const MONGO_URI = process.env.MONGO_URI;
 const guildId = '1377306965872611388';
