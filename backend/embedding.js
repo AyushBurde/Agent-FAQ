@@ -27,4 +27,3 @@ async function getEmbedding(text) {
 }
 
 module.exports = { getEmbedding };
-

@@ -1,15 +1,14 @@
 // frontend/src/App.jsx
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 
 import Sidebar from './components/Sidebar';
-//import FAQTable from './components/faqTable';
-
-// import Dashboard from './pages/Dashboard';
-// import FAQManager from './pages/FAQManager';
-// import Activity from './pages/Activity';
-// import Settings from './pages/Settings';
-// import Suggested from './pages/Suggested';
+import Dashboard from '../pages/Dashboard.jsx';
+import FAQManager from '../pages/FAQManager.jsx';
+import Activity from '../pages/Activity.jsx';
+import Settings from '../pages/Settings.jsx';
+import Suggested from '../pages/Suggested.jsx';
 
 export default function App() {
   return (
@@ -27,6 +26,7 @@ export default function App() {
             <Route path="*" element={<div>404 - Page not found</div>} />
           </Routes>
         </main>
+        <Toaster position="top-right" />
       </div>
     </Router>
   );

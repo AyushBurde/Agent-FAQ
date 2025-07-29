@@ -11,5 +11,3 @@ function cosineSimilarity(vecA, vecB) {
 }
 
 module.exports = { cosineSimilarity };
-
-
