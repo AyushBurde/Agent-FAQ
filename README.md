@@ -120,22 +120,16 @@ Agent-FAQ/
 
 ### **Frontend (Dashboard)**
 ```
-https://your-frontend-name.vercel.app
+http://agent-faq.vercel.app
 ```
 
 ### **Backend API**
 ```
 https://agent-faq.onrender.com
 ```
-
-### **API Health Check**
-```
-https://agent-faq.onrender.com/api/health
-```
-
 ---
 
-## 🚦 Quick Start
+##  Quick Start
 
 ### **Prerequisites**
 - Node.js 18+ installed
