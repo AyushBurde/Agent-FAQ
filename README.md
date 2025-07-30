@@ -8,44 +8,44 @@
 
 ## 📋 Table of Contents
 
-- [🚀 Features](#-features)
-- [🛠️ Tech Stack](#️-tech-stack)
-- [📦 Project Structure](#-project-structure)
-- [🌐 Live Demo](#-live-demo)
-- [🚦 Quick Start](#-quick-start)
-- [📱 Screenshots](#-screenshots)
-- [🔧 API Endpoints](#-api-endpoints)
-- [📊 Database Schema](#-database-schema)
-- [🚀 Deployment](#-deployment)
-- [🤝 Contributing](#-contributing)
-- [📄 License](#-license)
-- [👥 Authors](#-authors)
+- [ Features](#-features)
+- [ Tech Stack](#️-tech-stack)
+- [ Project Structure](#-project-structure)
+- [ Live Demo](#-live-demo)
+- [ Quick Start](#-quick-start)
+- [ Screenshots](#-screenshots)
+- [ API Endpoints](#-api-endpoints)
+- [ Database Schema](#-database-schema)
+- [ Deployment](#-deployment)
+- [ Contributing](#-contributing)
+- [ License](#-license)
+- [ Authors](#-authors)
 
 ---
 
 ## 🚀 Features
 
-### 🤖 **AI-Powered FAQ Matching**
+###  **AI-Powered FAQ Matching**
 - **Semantic Similarity**: Uses embeddings to understand user intent
 - **Smart Matching**: Finds relevant FAQs even with different wording
 - **Configurable Threshold**: Adjustable similarity matching (0.1-1.0)
 
-### 📊 **Analytics Dashboard**
+###  **Analytics Dashboard**
 - **Real-time Statistics**: Total FAQs, unanswered questions, accuracy rates
 - **Activity Tracking**: Monitor bot performance and user interactions
 - **Visual Charts**: Beautiful graphs showing usage patterns
 
-### 🔧 **Admin Management**
+###  **Admin Management**
 - **FAQ Management**: Add, edit, delete FAQs with rich text editor
 - **Settings Configuration**: Customize bot behavior and appearance
 - **User Management**: Team collaboration with role-based access
 
-### 🧠 **Self-Learning System**
+###  **Self-Learning System**
 - **Unknown Question Tracking**: Automatically saves questions that don't match
 - **AI Suggestions**: Generates suggested answers for frequent questions
 - **Admin Training**: Notifies admins when questions are asked 3+ times
 
-### 🔒 **Security & Authentication**
+###  **Security & Authentication**
 - **JWT Authentication**: Secure login system
 - **Role-based Access**: Admin and member permissions
 - **Team Invitations**: Secure team member onboarding
@@ -55,28 +55,28 @@
 ## 🛠️ Tech Stack
 
 ### **Frontend**
-- ⚛️ **React 19** — Modern UI framework
-- 🎨 **Tailwind CSS** — Utility-first styling
-- 🚀 **Vite** — Fast build tool
-- 📱 **React Router** — Client-side routing
-- 🔔 **React Hot Toast** — Beautiful notifications
+-  **React 19** — Modern UI framework
+-  **Tailwind CSS** — Utility-first styling
+-  **Vite** — Fast build tool
+-  **React Router** — Client-side routing
+-  **React Hot Toast** — Beautiful notifications
 
 ### **Backend**
-- ⚡ **Node.js** — JavaScript runtime
-- 🌐 **Express.js** — Web framework
-- 🔐 **JWT** — Authentication
-- 📧 **Nodemailer** — Email notifications
-- 🧠 **OpenAI/Gemini** — AI embeddings
+-  **Node.js** — JavaScript runtime
+-  **Express.js** — Web framework
+-  **JWT** — Authentication
+-  **Nodemailer** — Email notifications
+-  **OpenAI/Gemini** — AI embeddings
 
 ### **Database**
-- 🗄️ **MongoDB Atlas** — Cloud database
-- 📊 **Mongoose** — ODM for MongoDB
-- 🔄 **MongoDB Driver** — Database connectivity
+-  **MongoDB Atlas** — Cloud database
+-  **Mongoose** — ODM for MongoDB
+-  **MongoDB Driver** — Database connectivity
 
 ### **Deployment**
-- 🚀 **Vercel** — Frontend hosting
-- ⚡ **Render** — Backend hosting
-- ☁️ **MongoDB Atlas** — Database hosting
+-  **Vercel** — Frontend hosting
+-  **Render** — Backend hosting
+-  **MongoDB Atlas** — Database hosting
 
 ---
 
@@ -120,17 +120,12 @@ Agent-FAQ/
 
 ### **Frontend (Dashboard)**
 ```
-https://your-frontend-name.vercel.app
+http://agent-faq.vercel.app
 ```
 
 ### **Backend API**
 ```
 https://agent-faq.onrender.com
-```
-
-### **API Health Check**
-```
-https://agent-faq.onrender.com/api/health
 ```
 
 ---
@@ -198,19 +193,6 @@ npm run dev
 ### **5. Access the Application**
 - **Frontend**: http://localhost:5173
 - **Backend API**: http://localhost:3000
-
----
-
-## 📱 Screenshots
-
-### **Dashboard Overview**
-![Dashboard](https://via.placeholder.com/800x400/4F46E5/FFFFFF?text=Dashboard+Overview)
-
-### **FAQ Management**
-![FAQ Management](https://via.placeholder.com/800x400/10B981/FFFFFF?text=FAQ+Management)
-
-### **Analytics**
-![Analytics](https://via.placeholder.com/800x400/F59E0B/FFFFFF?text=Analytics+Dashboard)
 
 ---
 
@@ -434,7 +416,7 @@ SOFTWARE.
 
 ---
 
-## 🙏 Acknowledgments
+##  Acknowledgments
 
 - **OpenAI** for AI embeddings and suggestions
 - **Google Gemini** for alternative AI services
@@ -445,11 +427,11 @@ SOFTWARE.
 
 ---
 
-## 📞 Support
+##  Support
 
 If you need help or have questions:
 
-- 📧 **Email**: [your-email@example.com]
+- 📧 **Email**: [dakshnayak635@gmail.com] [aayuworks7@gmail.com]
 - 🐛 **Issues**: [GitHub Issues](https://github.com/DakshN07/Agent-FAQ/issues)
 - 💬 **Discussions**: [GitHub Discussions](https://github.com/DakshN07/Agent-FAQ/discussions)
 
