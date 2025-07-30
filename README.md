@@ -13,7 +13,6 @@
 - [ Project Structure](#-project-structure)
 - [ Live Demo](#-live-demo)
 - [ Quick Start](#-quick-start)
-- [ Screenshots](#-screenshots)
 - [ API Endpoints](#-api-endpoints)
 - [ Database Schema](#-database-schema)
 - [ Deployment](#-deployment)
