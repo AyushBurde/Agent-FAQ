@@ -1,14 +1,9 @@
 require('dotenv').config({ path: __dirname + '/.env' });
-console.log('DEBUG: GEMINI_API_KEY:', process.env.GEMINI_API_KEY);
-console.log('DEBUG: All ENV:', process.env);
-const { Client, GatewayIntentBits, PermissionsBitField } = require('discord.js');
-const { getEmbedding } = require('./backend/embedding');
-const { cosineSimilarity } = require('./backend/similarity');
-const mongoose = require('mongoose');
-const Faq = require('./models/Faq');
-const UnknownQuestion = require('./models/UnknownQuestion');
-const Analytics = require('./models/Analytics');
-
+console.log('DEBUG: GEMINI_API_KEY:', process.env.GEMINI_API_KEY ? 'Set' : 'Not Set');
+const { Client, GatewayIntentBits } = require('discord.js');
+const { getEmbedding } = require('./services/embedding');
+const { cosineSimilarity } = require('./services/similarity');
+const storage = require('./utils/storage');
 
 const client = new Client({
   intents: [
@@ -20,73 +15,56 @@ const client = new Client({
   partials: ['CHANNEL'],
 });
 
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-.then(() => console.log("✅ MongoDB connected"))
-.catch((err) => console.error("❌ MongoDB error", err));
-
 // Map to track admins who have pending FAQ reply requests (adminId => { guildId, question })
 const pendingFaqReplies = new Map();
 
 // Put your admin Discord user ID here:
-const adminId = '974589644723326997';
+const adminId = '1318996489607057522';
 
 client.once('ready', () => {
-  console.log(`🤖 Bot is online as ${client.user.tag}`);
+  console.log(`Bot is online as ${client.user.tag}`);
 });
 
 client.on('messageCreate', async (message) => {
   if (message.author.bot) return;
 
-  const isDM = message.channel.type === 1;
+  const isDM = message.channel.type === 1; // DM channel type is 1 in discord.js v14 it might be different, but keeping logic consistent
 
   // Handle admin replies in DMs (answering unknown questions)
-  if (isDM) {
+  if (!message.guild && pendingFaqReplies.has(message.author.id)) {
     const pending = pendingFaqReplies.get(message.author.id);
-    if (pending) {
-      const { guildId, question } = pending;
+    const { guildId, question } = pending;
 
-      // Admin chooses to skip saving answer
-      if (message.content.toLowerCase().trim() === 'skip') {
-        // Update analytics: This question was asked 3 times but skipped
-        const analyticsDoc = await Analytics.findOne() || await Analytics.create({});
-        analyticsDoc.unmatched += 1;
-        await analyticsDoc.save();
-        
-        await message.reply("✅ Skipped saving the question.");
-        pendingFaqReplies.delete(message.author.id);
-        return;
-      }
-
-      // Generate embedding for question to save with answer
-      const embedding = await getEmbedding(question);
-      if (!embedding) {
-        await message.reply("❌ Failed to generate embedding.");
-        return;
-      }
-
-      // Save new FAQ entry in DB
-      await Faq.create({
-        guildId,
-        question,
-        answer: message.content.trim(),
-        embedding
-      });
-
-      // Update analytics: This question was asked 3 times and now answered
-      const analyticsDoc = await Analytics.findOne() || await Analytics.create({});
-      analyticsDoc.matched += 1;
-      await analyticsDoc.save();
-
-      await message.reply("✅ New FAQ saved successfully!");
-      console.log(`✅ Saved new FAQ for guild ${guildId}: "${question}" -> "${message.content.trim()}"`);
-
-      // Remove pending state for admin
+    // Admin chooses to skip saving answer
+    if (message.content.toLowerCase().trim() === 'skip') {
+      // Logic for skipped question - currently just removing pending state
+      // In advanced version we could update analytics
+      await message.reply("✅ Skipped saving the question.");
       pendingFaqReplies.delete(message.author.id);
       return;
     }
+
+    // Generate embedding for question to save with answer
+    const embedding = await getEmbedding(question);
+    if (!embedding) {
+      await message.reply("❌ Failed to generate embedding.");
+      return;
+    }
+
+    // Save new FAQ entry in JSON Storage
+    await storage.addFaq({
+      guildId,
+      question,
+      answer: message.content.trim(),
+      embedding
+    });
+
+    await message.reply("✅ New FAQ saved successfully!");
+    console.log(`✅ Saved new FAQ for guild ${guildId}: "${question}" -> "${message.content.trim()}"`);
+
+    // Remove pending state for admin
+    pendingFaqReplies.delete(message.author.id);
+    return;
   }
 
   // Only handle messages inside guilds
@@ -95,23 +73,26 @@ client.on('messageCreate', async (message) => {
   const guildId = message.guild.id;
   const userMsg = message.content.toLowerCase().trim();
 
-  // Load all FAQs for the guild
-  const faqs = await Faq.find({ guildId });
+  // Load all FAQs for the guild from JSON Storage
+  const allFaqs = await storage.getFaqs();
+  // Filter for this guild (if we strictly enforce guild-specific FAQs, otherwise check all "default" or specific)
+  const faqs = allFaqs.filter(f => f.guildId === guildId || f.guildId === 'default');
+
   if (!faqs.length) {
-    await message.channel.send("🤔 No FAQs found yet.");
-    return;
+    // No FAQs at all? Just return for now, or maybe default message
+    // return; 
   }
 
   // Get embedding for user's message
   const userEmbedding = await getEmbedding(userMsg);
   if (!userEmbedding) return;
 
-  const cleanedMsg = userMsg.replace(/<@!?\d+>/g, '').trim();
-
   // Find best matching FAQ using cosine similarity
   let bestMatch = null;
   let bestScore = 0.0;
+
   for (const faq of faqs) {
+    if (!faq.embedding) continue;
     const score = cosineSimilarity(userEmbedding, faq.embedding);
     if (score > bestScore) {
       bestScore = score;
@@ -123,60 +104,55 @@ client.on('messageCreate', async (message) => {
   console.log("📘 Matched FAQ:", bestMatch?.question);
   console.log("📊 Similarity score:", bestScore);
 
-  // First check if we have a good match (>= 0.85)
-  if (bestScore >= 0.85) {
-    const analyticsDoc = await Analytics.findOne() || await Analytics.create({});
-    analyticsDoc.matched += 1;
-    await analyticsDoc.save();
-    console.log(`🧠 Matched with "${bestMatch.question}" in guild ${guildId} (score: ${bestScore.toFixed(2)})`);
+  // Get similarity threshold from settings
+  const settings = await storage.getSettings();
+  const THRESHOLD = settings.similarityThreshold || 0.85;
+
+  // Check match
+  if (bestScore >= THRESHOLD) {
+    console.log(`🧠 Matched with "${bestMatch.question}" (score: ${bestScore.toFixed(2)})`);
+    console.log(`🧠 Matched with "${bestMatch.question}" (score: ${bestScore.toFixed(2)})`);
+    await storage.logActivity('matched', message.author.id); // Log successful match with user ID
     await message.channel.send(bestMatch.answer);
     return;
   }
 
-  // If no good match, handle unknown question tracking
-  let unknown = await UnknownQuestion.findOne({ guildId, text: userMsg });
+  // Handle Unknown Question
+  // Add to unknown storage
+  const unknown = await storage.addUnknownQuestion(userMsg, guildId);
 
-  if (unknown) {
-    // Increment count since question was asked again
-    unknown.count++;
-    await unknown.save();
+  // Notify admin if count reaches threshold (e.g. 3)
+  if (unknown.count === 3) {
+    try {
+      const adminUser = await client.users.fetch(adminId);
+      if (adminUser) {
+        await adminUser.send(
+          `❓ The question **"${userMsg}"** has been asked 3 times in **${message.guild.name}**.\n` +
+          `Reply with an answer or type \`skip\` to ignore.`
+        );
 
-    // Notify admin only when count reaches 3
-    if (unknown.count === 3) {
-      try {
-        const adminUser = await client.users.fetch(adminId);
-        if (adminUser) {
-          await adminUser.send(
-            `❓ The question **"${userMsg}"** has been asked 3 times in **${message.guild.name}** by different users.\n` +
-            `Reply with an answer or type \`skip\` to ignore.`
-          );
-
-          // Track this question pending reply from admin
-          pendingFaqReplies.set(adminUser.id, { guildId, question: userMsg });
-        }
-      } catch (err) {
-        console.error("Failed to send DM to admin:", err);
+        // Track this as pending
+        pendingFaqReplies.set(adminUser.id, { guildId, question: userMsg });
       }
-
-      // Remove this unknown question so admin is not spammed repeatedly
-      await UnknownQuestion.deleteOne({ _id: unknown._id });
-
-      return;
+    } catch (err) {
+      console.error("Failed to send DM to admin:", err);
     }
-  } else {
-    // First time this unknown question was asked, save with count = 1
-    await UnknownQuestion.create({
-      guildId,
-      text: userMsg,
-      count: 1,
-      embedding: userEmbedding,
-    });
+
+    // We could technically delete it from 'unknowns' here if we want to reset processing
+    // but for now we keep it as record.
+    // We could technically delete it from 'unknowns' here if we want to reset processing
+    // but for now we keep it as record.
+    await storage.logActivity('unmatched', message.author.id); // Log unmatched with user ID
+    return;
+  } else if (unknown.count === 1) {
+    // First time asked
+    await storage.logActivity('unmatched', message.author.id); // Log unmatched with user ID
+    // await message.channel.send("🤔 I'm not sure how to answer that yet.");
   }
 
-  // If no match and no admin notification needed yet, send default message
-  await message.channel.send("🤔 I'm not sure how to answer that yet.");
+  // Optional: Send default message if no match found
+  // await message.channel.send("🤔 I'm not sure how to answer that yet.");
 });
 
-
-
 client.login(process.env.DISCORD_TOKEN);
+

@@ -1,15 +1,20 @@
+const express = require('express');
+const router = express.Router();
 const axios = require('axios');
+const { authenticate } = require('../middleware/auth');
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
-async function handler(req, res) {
-  if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
-
+// GET /ask?question=...
+router.get('/ask', authenticate, async (req, res) => {
   const { question } = req.query;
   if (!question) return res.status(400).json({ error: 'Missing question' });
 
   try {
-    // Example using OpenAI API (GPT-3.5/4)
+    if (!OPENAI_API_KEY) {
+      return res.status(503).json({ error: "AI service not configured" });
+    }
+
     const response = await axios.post(
       'https://api.openai.com/v1/chat/completions',
       {
@@ -31,8 +36,9 @@ async function handler(req, res) {
     const aiAnswer = response.data.choices[0].message.content.trim();
     res.status(200).json({ answer: aiAnswer });
   } catch (error) {
+    console.error("AI Error:", error.message);
     res.status(500).json({ error: error.response?.data || error.message });
   }
-}
+});
 
-module.exports = handler; 
+module.exports = router;
